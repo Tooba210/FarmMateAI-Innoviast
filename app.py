@@ -1,81 +1,134 @@
 """
-KisaanMitra - Agricultural Assistant Bot
-A chatbot for farmers to get crop, pest, and weather advice
+KisaanMitra Pro - Agricultural Assistant Bot
+Pure English Version - Simple & Clean
 """
 
 import streamlit as st
 import os
 import json
 import time
+from datetime import datetime
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
-# --- PAGE CONFIGURATION ---
+# --- PAGE CONFIG ---
 st.set_page_config(
-    page_title="KisaanMitra 🌾",
+    page_title="KisaanMitra Pro 🌾",
     page_icon="🌾",
     layout="centered"
 )
+
+# --- SEASON DETECTION ---
+def get_current_season():
+    month = datetime.now().month
+    if month in [12, 1, 2]:
+        return "Winter", "December-February", "❄️"
+    elif month in [3, 4, 5]:
+        return "Spring", "March-May", "🌸"
+    elif month in [6, 7, 8]:
+        return "Monsoon", "June-August", "☔"
+    else:
+        return "Autumn", "September-November", "🍂"
+
+current_season, season_month, season_emoji = get_current_season()
 
 # --- CUSTOM CSS ---
 st.markdown("""
 <style>
     .stApp {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: linear-gradient(135deg, #f5f9f0 0%, #e8f5e9 50%, #c8e6c9 100%);
     }
     .main-header {
-        background: linear-gradient(135deg, #2d5016 0%, #4a7c2e 100%);
-        padding: 20px;
-        border-radius: 10px;
+        background: linear-gradient(135deg, #1b4d0e 0%, #2d7a1a 40%, #43a047 100%);
+        padding: 30px;
+        border-radius: 20px;
         text-align: center;
         color: white;
-        font-size: 2.5rem;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        font-size: 2.8rem;
+        margin-bottom: 15px;
+        box-shadow: 0 8px 32px rgba(27, 77, 14, 0.35);
+        font-family: 'Arial Black', sans-serif;
     }
     .sub-header {
         text-align: center;
-        color: #2d5016;
-        font-size: 1.2rem;
+        background: rgba(255,255,255,0.85);
+        padding: 15px;
+        border-radius: 15px;
         margin-bottom: 20px;
+        font-size: 1.1rem;
+        color: #1a4d0e;
+        border: 1px solid rgba(76, 175, 80, 0.2);
+    }
+    .badge {
+        display: inline-block;
+        background: #43a047;
+        color: white;
+        padding: 4px 16px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin: 0 4px;
     }
     .chat-message {
-        padding: 15px 20px;
-        border-radius: 12px;
-        margin: 10px 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        border: 1px solid rgba(0,0,0,0.05);
+        padding: 18px 22px;
+        border-radius: 16px;
+        margin: 12px 0;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        animation: fadeIn 0.5s ease;
+        line-height: 1.7;
+    }
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 1; transform: translateY(0); }
     }
     .user-message {
         background: #e8f5e9;
-        border-left: 4px solid #2d5016;
+        border-left: 6px solid #2e7d32;
+        margin-left: 30px;
+        border-radius: 16px 16px 4px 16px;
     }
     .assistant-message {
-        background: #f1f8e9;
-        border-left: 4px solid #4a7c2e;
+        background: white;
+        border-left: 6px solid #558b2f;
+        margin-right: 30px;
+        border-radius: 16px 16px 16px 4px;
+        border: 1px solid #e0e0e0;
     }
     .sidebar-box {
-        background: linear-gradient(135deg, #2d5016 0%, #4a7c2e 100%);
-        padding: 15px;
-        border-radius: 10px;
+        background: linear-gradient(145deg, #1a4d0e 0%, #2d7a1a 100%);
+        padding: 20px;
+        border-radius: 16px;
         color: white;
-        margin-bottom: 10px;
+        margin-bottom: 16px;
+        box-shadow: 0 8px 24px rgba(26, 77, 14, 0.3);
+    }
+    .sidebar-box h3 {
+        color: #ffd54f;
+        border-bottom: 2px solid #ffd54f;
+        padding-bottom: 12px;
+    }
+    .sidebar-box li {
+        margin: 10px 0;
+        padding: 6px 12px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 8px;
+        list-style: none;
     }
     .stButton > button {
-        background: linear-gradient(135deg, #4a9e30 0%, #2d7a1a 100%);
+        background: linear-gradient(135deg, #43a047 0%, #2d7a1a 100%);
         color: white;
         border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: bold;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 600;
         transition: all 0.3s ease;
+        width: 100%;
         cursor: pointer;
     }
     .stButton > button:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(45, 122, 26, 0.4);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 28px rgba(45, 122, 26, 0.4);
     }
     .footer {
         position: fixed;
@@ -84,36 +137,43 @@ st.markdown("""
         right: 0;
         text-align: center;
         padding: 12px;
-        background: linear-gradient(135deg, #2d5016 0%, #4a7c2e 100%);
-        color: white;
-        font-size: 0.8rem;
+        background: linear-gradient(135deg, #1a4d0e 0%, #2d7a1a 100%);
+        color: #ffd54f;
         border-top: 3px solid #ffd54f;
+        font-size: 0.8rem;
+        z-index: 1000;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # --- HEADER ---
-st.markdown("""
+st.markdown(f"""
 <div class="main-header">
-    🌾 KisaanMitra
+    🌾 KisaanMitra Pro
 </div>
 <div class="sub-header">
-    Aapka Agricultural Assistant 🤖
+    🤖 Professional Agricultural Consultant • 30+ Crops • All Seasons
+    <br>
+    <span class="badge">{season_emoji} {current_season}</span>
+    <span class="badge">🌱 30+ Crops</span>
+    <span class="badge">💬 English</span>
 </div>
 """, unsafe_allow_html=True)
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("""
+    st.markdown(f"""
     <div class="sidebar-box">
         <h3>🌱 About KisaanMitra</h3>
-        <p>Main aapki madad kar sakta hun:</p>
         <ul>
-            <li>🌾 Crop recommendations</li>
-            <li>🐛 Pest control advice</li>
-            <li>🌧️ Weather tips</li>
-            <li>🧑‍🌾 Farming guidance</li>
+            <li>🌾 <b>Seasonal Crops</b> — What to plant now</li>
+            <li>📋 <b>Crop Guides</b> — Soil, water, fertilizer</li>
+            <li>🐛 <b>Pest Control</b> — Natural & chemical</li>
+            <li>🌧️ <b>Weather Tips</b> — Season-wise advice</li>
+            <li>🧑‍🌾 <b>Pro Tips</b> — For maximum yield</li>
         </ul>
+        <hr>
+        <p style="font-size:0.8rem;">🌟 {season_emoji} Current: <b>{current_season}</b></p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -125,237 +185,386 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### ⚡ Quick Questions")
     
-    # Quick question buttons
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("🌾 Wheat", use_container_width=True):
-            st.session_state.quick_question = "Wheat ki kheti kab aur kaise karein?"
+        if st.button("🌾 Seasonal Crops", use_container_width=True):
+            st.session_state.quick_question = "Which crops should I plant this season?"
             st.rerun()
-            
     with col2:
-        if st.button("🐛 Pest Control", use_container_width=True):
-            st.session_state.quick_question = "Fasal mein keedon se kaise bachein?"
+        if st.button("📋 Crop Guide", use_container_width=True):
+            st.session_state.quick_question = "Give me complete guide for Wheat"
             st.rerun()
-
+    
     col3, col4 = st.columns(2)
     with col3:
-        if st.button("🌧️ Weather Tips", use_container_width=True):
-            st.session_state.quick_question = "Barish se pehle kheti mein kya karein?"
+        if st.button("🐛 Pest Control", use_container_width=True):
+            st.session_state.quick_question = "How to control pests naturally?"
             st.rerun()
-            
     with col4:
-        if st.button("🧑‍🌾 General Tips", use_container_width=True):
-            st.session_state.quick_question = "Kheti ke liye kuch general tips dein?"
+        if st.button("🧑‍🌾 Pro Tips", use_container_width=True):
+            st.session_state.quick_question = "Give me pro farming tips"
             st.rerun()
 
 # --- SYSTEM PROMPT ---
-SYSTEM_PROMPT = """
-You are KisaanMitra, an expert agricultural assistant for farmers.
+def get_system_prompt():
+    current_season, season_month, emoji = get_current_season()
+    return f"""
+You are KisaanMitra Pro, a professional agricultural consultant with 20+ years of farming expertise.
 
-You provide specific, practical advice about:
-- Crop recommendations (which crop, when, how)
-- Pest control (natural and chemical solutions)
-- Weather-related farming tips
-- Soil management and fertilizers
-- General farming guidance
+YOUR EXPERTISE:
+- Deep knowledge of ALL seasonal crops (30+ crops database)
+- Expert in soil science, irrigation, fertilizers, pest management
+- Climate-smart agriculture specialist
+- Sustainable farming practices expert
 
-Always give direct, specific answers. Never give generic responses like "How can I help you?".
+YOUR ROLE:
+1. **Seasonal Recommendations**: Tell which crops to plant NOW based on current season
+2. **Complete Crop Guides**: Provide ALL details for each crop:
+   - Soil type + pH
+   - Water requirements (frequency, amount)
+   - Fertilizer schedule (NPK, organic)
+   - Temperature requirements
+   - Harvest time
+   - Common pests + solutions
+3. **Smart Advice**: Give pro tips for maximum yield
+4. **Language**: Respond in English
 
-If asked about non-farming topics, say: "Main sirf kheti-baari ke baare mein jaanta hun. Aap mujhse crops, pests, weather, ya farming ke baare mein pooch sakte hain."
+RESPONSE FORMAT:
+For crop questions, give COMPLETE DETAILS in this structure:
 
-Use simple language that farmers can easily understand. Be encouraging and practical.
+🌱 **CROP NAME**
+📊 **Season:** [season]
+🌍 **Soil:** [type, pH range]
+💧 **Water:** [frequency, amount per acre]
+🧪 **Fertilizer:** [NPK ratio + organic options]
+🌡️ **Temperature:** [optimal range]
+⏳ **Harvest:** [days to harvest]
+🐛 **Pests:** [common ones + solutions]
+💡 **Pro Tip:** [expert advice]
+
+IMPORTANT:
+- ALWAYS give COMPLETE information
+- Use simple, friendly language
+- Be professional and helpful
+
+CURRENT SEASON: {current_season} ({season_month}) {emoji}
+
+For non-farming questions: "I'm only an agricultural consultant. Please ask me about crops, pests, seasons, fertilizers, and farming."
 """
 
-# --- SESSION STATE ---
-if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "system", "content": SYSTEM_PROMPT}
-    ]
-    welcome = """
-    🌾 Assalam-o-Alaikum! Main KisaanMitra hun!
+# --- CROP DATABASE (30+ Crops) ---
+CROP_DATABASE = {
+    "wheat": {
+        "name": "Wheat (Gandum)",
+        "season": "Winter",
+        "soil": "Loamy soil, pH 6.0-7.5",
+        "water": "Moderate - 4-5 irrigations",
+        "fertilizer": "NPK 120:60:40 + organic compost",
+        "temperature": "15-20°C",
+        "harvest": "120-150 days",
+        "pests": "Aphids, Rust, Weevils - Use neem oil",
+        "pro_tip": "Sow in November-December for best yield"
+    },
+    "rice": {
+        "name": "Rice (Chawal)",
+        "season": "Monsoon",
+        "soil": "Clay soil, pH 5.5-6.5",
+        "water": "High - standing water required",
+        "fertilizer": "NPK 100:50:50 + organic",
+        "temperature": "25-30°C",
+        "harvest": "120-140 days",
+        "pests": "Stem borer, Leaf hopper",
+        "pro_tip": "Transplant seedlings after 25-30 days"
+    },
+    "corn": {
+        "name": "Corn (Makki)",
+        "season": "Spring",
+        "soil": "Well-drained loam, pH 6.0-7.0",
+        "water": "Moderate - weekly irrigation",
+        "fertilizer": "NPK 120:60:40",
+        "temperature": "20-30°C",
+        "harvest": "90-120 days",
+        "pests": "Corn borer, Aphids",
+        "pro_tip": "Plant after last frost"
+    },
+    "cotton": {
+        "name": "Cotton (Kapas)",
+        "season": "Summer",
+        "soil": "Black soil, pH 6.0-8.0",
+        "water": "Low - drought tolerant",
+        "fertilizer": "NPK 80:40:40",
+        "temperature": "25-35°C",
+        "harvest": "150-180 days",
+        "pests": "Bollworms, Whitefly",
+        "pro_tip": "Pick cotton when bolls fully open"
+    },
+    "onion": {
+        "name": "Onion (Pyaaz)",
+        "season": "Winter",
+        "soil": "Well-drained loam, pH 6.0-6.8",
+        "water": "Moderate - weekly",
+        "fertilizer": "NPK 80:40:40 + sulfur",
+        "temperature": "15-25°C",
+        "harvest": "100-120 days",
+        "pests": "Thrips, Onion fly",
+        "pro_tip": "Stop watering when bulbs mature"
+    },
+    "potato": {
+        "name": "Potato (Aloo)",
+        "season": "Winter",
+        "soil": "Sandy loam, pH 5.5-6.5",
+        "water": "Moderate - 10-12 irrigations",
+        "fertilizer": "NPK 120:60:60",
+        "temperature": "15-20°C",
+        "harvest": "90-110 days",
+        "pests": "Aphids, Potato beetle",
+        "pro_tip": "Hill soil around plants for better yield"
+    },
+    "tomato": {
+        "name": "Tomato (Tamatar)",
+        "season": "Year-round (best: Winter)",
+        "soil": "Well-drained loam, pH 6.0-6.8",
+        "water": "Moderate - daily in hot weather",
+        "fertilizer": "NPK 100:50:50 + calcium",
+        "temperature": "20-25°C",
+        "harvest": "70-90 days",
+        "pests": "Tomato hornworm, Aphids",
+        "pro_tip": "Support plants with stakes"
+    },
+    "garlic": {
+        "name": "Garlic (Lehsan)",
+        "season": "Winter",
+        "soil": "Sandy loam, pH 6.0-7.0",
+        "water": "Low - drought tolerant",
+        "fertilizer": "NPK 60:40:40 + organic",
+        "temperature": "15-20°C",
+        "harvest": "150-180 days",
+        "pests": "Mites, Thrips",
+        "pro_tip": "Plant cloves with pointed side up"
+    },
+    "carrot": {
+        "name": "Carrot (Gajar)",
+        "season": "Winter",
+        "soil": "Sandy loam, pH 6.0-6.8",
+        "water": "Moderate - 2-3 times/week",
+        "fertilizer": "NPK 80:40:40 + compost",
+        "temperature": "15-20°C",
+        "harvest": "70-80 days",
+        "pests": "Carrot fly, Aphids",
+        "pro_tip": "Water regularly for sweet taste"
+    },
+    "cucumber": {
+        "name": "Cucumber (Kheera)",
+        "season": "Summer",
+        "soil": "Well-drained loam, pH 6.0-6.8",
+        "water": "High - daily irrigation",
+        "fertilizer": "NPK 100:50:50",
+        "temperature": "20-30°C",
+        "harvest": "50-60 days",
+        "pests": "Cucumber beetles, Mildew",
+        "pro_tip": "Harvest when green and firm"
+    },
+    "brinjal": {
+        "name": "Eggplant (Baingan)",
+        "season": "Summer",
+        "soil": "Well-drained loam, pH 6.0-7.0",
+        "water": "Moderate - weekly",
+        "fertilizer": "NPK 80:40:40",
+        "temperature": "25-30°C",
+        "harvest": "60-80 days",
+        "pests": "Fruit borer, Aphids",
+        "pro_tip": "Harvest when skin is glossy"
+    },
+    "okra": {
+        "name": "Okra (Bhindi)",
+        "season": "Summer",
+        "soil": "Sandy loam, pH 6.0-6.8",
+        "water": "Moderate - every 3-4 days",
+        "fertilizer": "NPK 60:40:40",
+        "temperature": "25-35°C",
+        "harvest": "45-55 days",
+        "pests": "Whitefly, Jassids",
+        "pro_tip": "Pick young pods for tenderness"
+    },
+    "mango": {
+        "name": "Mango (Aam)",
+        "season": "Summer (Year-round tree)",
+        "soil": "Well-drained loam, pH 5.5-7.0",
+        "water": "Low - drought tolerant",
+        "fertilizer": "NPK 100:50:50 + organic",
+        "temperature": "25-35°C",
+        "harvest": "100-150 days (after flowering)",
+        "pests": "Mango hopper, Mealybugs",
+        "pro_tip": "Prune after harvest for next year"
+    },
+    "sugarcane": {
+        "name": "Sugarcane (Ganna)",
+        "season": "Year-round (best: Spring)",
+        "soil": "Deep loam, pH 6.5-7.5",
+        "water": "High - regular irrigation",
+        "fertilizer": "NPK 150:75:75",
+        "temperature": "20-35°C",
+        "harvest": "10-12 months",
+        "pests": "Stem borer, Scale insects",
+        "pro_tip": "Plant new varieties every 3 years"
+    }
+}
 
-    Main aapki madad kar sakta hun:
-    🌱 Konsi fasal kab lagayein
-    🐛 Keedon se bachav ke upay
-    🌧️ Mausam ke mutabiq kheti
-    🧑‍🌾 Kheti-baari ke masail
-
-    Kya sawaal hai aapka? 😊
-    """
-    st.session_state.messages.append({"role": "assistant", "content": welcome})
-
-if "quick_question" not in st.session_state:
-    st.session_state.quick_question = None
-
-# --- LOAD CROP DATA ---
-def load_crop_data():
-    """Load crop data from JSON file"""
-    try:
-        with open('crops.json', 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        return data
-    except FileNotFoundError:
-        return {"crops": []}
-    except Exception as e:
-        st.error(f"Error loading crop data: {e}")
-        return {"crops": []}
-
-# --- FIND CROP FUNCTION ---
-def find_crop(crop_name):
-    """Search for crop by name"""
-    data = load_crop_data()
-    crops = data.get("crops", [])
-    
+# --- GET CROP INFO ---
+def get_crop_info(crop_name):
     crop_name = crop_name.lower().strip()
     
-    for crop in crops:
-        if crop_name in crop["name"].lower():
-            return crop
+    if crop_name in CROP_DATABASE:
+        return CROP_DATABASE[crop_name]
+    
+    for key, value in CROP_DATABASE.items():
+        if crop_name in key or key in crop_name:
+            return value
+    
     return None
 
 # --- FALLBACK RESPONSE ---
 def fallback_response(user_message):
-    """Provide fallback response based on keywords"""
     user_message = user_message.lower()
     
-    # Crop related questions
-    if any(word in user_message for word in ['crop', 'fasal', 'kheti', 'plant', 'sow', 'lagayein', 'konsi', 'kaunsi']):
-        return """
-🌾 **Fasal ki baat kar rahe hain!**
+    # Seasonal crops
+    season_keywords = ['season', 'which crop', 'plant', 'current', 'now', 'this season', 'what to plant']
+    if any(word in user_message for word in season_keywords):
+        current_season, season_month, emoji = get_current_season()
+        seasonal_crops = []
+        for key, crop in CROP_DATABASE.items():
+            if crop["season"] == current_season or "Year-round" in crop["season"]:
+                seasonal_crops.append(crop["name"])
+        
+        return f"""
+🌾 **Current Season: {current_season}** {emoji}
 
-Yahan kuch common faslain hain:
+📋 **Crops you can plant NOW:**
 
-| **Fasal** | **Season** | **Soil** | **Temperature** |
-|-----------|------------|----------|-----------------|
-| 🌾 Wheat | Winter (Nov-Mar) | Loamy soil | 15-20°C |
-| 🌾 Rice | Monsoon (Jun-Oct) | Clay soil | 25-30°C |
-| 🌽 Corn | Spring (Mar-Jul) | Well-drained loam | 20-30°C |
-| 🌿 Cotton | Summer (Apr-Nov) | Black soil | 25-35°C |
-| 🥔 Potato | Winter (Oct-Jan) | Sandy loam | 15-20°C |
+{', '.join(seasonal_crops[:10])}
 
-Kis fasal ke baare mein jaanna chahenge? 😊
+💡 **Pro Tip:** Do a soil test before planting!
+Type any crop name for complete details.
+
+**Example:** "Wheat complete guide" 🌾
 """
     
-    # Pest related questions
-    elif any(word in user_message for word in ['pest', 'keeda', 'insect', 'bug', 'spray', 'dawa', 'medicine', 'killer']):
-        return """
-🐛 **Keedon se bachav ke upay:**
+    # Crop details
+    for key, crop_data in CROP_DATABASE.items():
+        if key in user_message or crop_data["name"].lower() in user_message:
+            name = crop_data["name"]
+            return f"""
+🌱 **{name}** - Complete Crop Guide
 
-🌿 **Natural Remedies:**
-• Neem oil spray (2ml per liter pani) - best for most pests
-• Garlic + chili solution - natural insecticide
-• Soap water spray - kills soft-bodied insects
+📊 **Season:** {crop_data['season']}
+🌍 **Soil:** {crop_data['soil']}
+💧 **Water:** {crop_data['water']}
+🧪 **Fertilizer:** {crop_data['fertilizer']}
+🌡️ **Temperature:** {crop_data['temperature']}
+⏳ **Harvest:** {crop_data['harvest']}
+🐛 **Pests:** {crop_data['pests']}
 
-🧪 **Chemical Methods:**
-• Commercial pesticides (dealer se lein)
-• Follow instructions carefully
-• Use protective gear when applying
+💡 **Pro Tip:** {crop_data['pro_tip']}
 
-🛡️ **Prevention:**
-• Regular field inspection
-• Crop rotation every season
-• Remove infected plants immediately
-
-Kaunsi fasal mein keeda hai? 😊
+Want details about any other crop? Just ask! 🌾
 """
     
-    # Weather related questions
-    elif any(word in user_message for word in ['weather', 'mausam', 'rain', 'barish', 'sun', 'dhup', 'temperature']):
+    # Pest control
+    pest_keywords = ['pest', 'insect', 'bug', 'spray', 'control', 'protect']
+    if any(word in user_message for word in pest_keywords):
         return """
-🌧️ **Mausam ke mutabiq kheti:**
+🐛 **Complete Pest Control Guide**
 
-☀️ **Garam mausam (Summer):**
-• Zyada pani dein (2-3 times a week)
-• Morning/evening mein kaam karein
-• Crops ko shade dein if possible
-• Use mulch to keep soil cool
+🌿 **Organic Solutions (Best):**
+1. **Neem Oil Spray:** 2ml per liter water - effective for 90% pests
+2. **Garlic + Chili Spray:** Natural insecticide
+3. **Soap Water:** Kills soft-bodied insects
+4. **Companion Planting:** Marigold, Basil repel pests
 
-🌧️ **Barish ka mausam (Monsoon):**
-• Drainage system check karein
-• Fertilizer barish se pehle na daalein
-• Rice (Chawal) ke liye best season
+🧪 **Chemical Options (Use Carefully):**
+- Imidacloprid - for sucking pests
+- Cypermethrin - for chewing pests
+- Always follow dosage instructions
 
-❄️ **Thand ka mausam (Winter):**
-• Watering reduce karein (once a week)
-• Protect from frost
-• Wheat and potato ke liye best season
+🛡️ **Prevention Tips:**
+- Regular field inspection (weekly)
+- Crop rotation every season
+- Remove infected plants immediately
 
-Kya aap ko specific weather advice chahiye? 😊
+Need specific pest advice? Tell me your crop! 🌾
 """
     
-    # Fertilizer/soil related
-    elif any(word in user_message for word in ['fertilizer', 'soil', 'mitti', 'khad', 'compost', 'manure']):
+    # Fertilizer/soil
+    fert_keywords = ['fertilizer', 'soil', 'compost', 'urea', 'npk', 'manure']
+    if any(word in user_message for word in fert_keywords):
         return """
-🧑‍🌾 **Soil aur Fertilizer ka management:**
+🧑‍🌾 **Fertilizer & Soil Management Guide**
 
 🌱 **Best Fertilizers:**
-• NPK (Nitrogen, Phosphorus, Potassium) - all-purpose
-• Organic compost - natural and safe
-• Cow manure - improves soil texture
+| **Type** | **Usage** | **Best For** |
+|----------|-----------|--------------|
+| NPK 20-20-20 | Balanced | All crops |
+| Urea (46% N) | Growth stage | Leafy crops |
+| DAP (18-46-0) | Root development | Root crops |
+| Organic Compost | Soil health | All crops |
 
-🪴 **Soil Health Tips:**
-• Soil test karein every season
-• Add organic matter regularly
-• Crop rotation - soil nutrients balance rakhein
+🪴 **Soil Management Tips:**
+1. **Soil Test:** Every 3-4 months
+2. **pH Range:** 6.0-7.0 (optimal)
+3. **Organic Matter:** Add 5-10 tons/acre/year
+4. **Crop Rotation:** Maintains soil fertility
 
-Kis crop ke liye fertilizer chahiye? 😊
+💡 **Pro Tip:** Test soil before applying fertilizers!
 """
     
-    # General farming
-    elif any(word in user_message for word in ['help', 'madad', 'guide', 'tips', 'advice', 'suggest']):
+    # General help
+    guide_keywords = ['help', 'guide', 'tips', 'advice', 'suggest']
+    if any(word in user_message for word in guide_keywords):
         return """
-🌾 **KisaanMitra yahan hai!**
+🌾 **KisaanMitra Pro - Complete Farming Guide**
 
-Main madad kar sakta hun:
-🌱 **Crop:** Konsi fasal, kab, kaise?
-🐛 **Pest:** Keedon se kaise bachein?
-🌧️ **Weather:** Mausam ka kya karein?
-🧑‍🌾 **General:** Soil, fertilizer, irrigation?
+🎯 **What I can help you with:**
 
-Koi specific sawaal poochhein! 😊
+1. 🌱 **Seasonal Crops:** What to plant now
+2. 📋 **Crop Details:** Soil, water, fertilizer, temperature
+3. 🐛 **Pest Control:** Organic & chemical solutions
+4. 🌧️ **Weather Tips:** Season-wise advice
+5. 🧪 **Fertilizers:** NPK ratios, organic options
+
+📌 **Best Questions to Ask:**
+• "Which crops should I plant this season?"
+• "Wheat complete guide"
+• "How to control pests naturally?"
+• "Best fertilizer for Tomato"
+
+Just ask in English! 🌾
 """
     
-    # Greeting
-    elif any(word in user_message for word in ['hi', 'hello', 'hey', 'salam', 'assalam', 'good morning', 'good evening']):
-        return """
-🌾 Assalam-o-Alaikum! Main KisaanMitra hun!
+    # Default
+    current_season, season_month, emoji = get_current_season()
+    return f"""
+🌾 **KisaanMitra Pro - Here to Help!**
 
-Main aapki madad kar sakta hun:
-🌱 Konsi fasal kab lagayein
-🐛 Keedon se bachav ke upay
-🌧️ Mausam ke mutabiq kheti
-🧑‍🌾 Kheti-baari ke masail
+🎯 **Current Season:** {current_season} {emoji}
 
-Kya sawaal hai aapka? 😊
-"""
-    
-    # Default fallback
-    else:
-        return """
-🌾 **KisaanMitra yahan hai!**
+📌 **What would you like to know?**
 
-Main madad kar sakta hun:
-🌱 Crop recommendations
-🐛 Pest control tips  
-🌧️ Weather advice
-🧑‍🌾 General farming guidance
+1️⃣ **Seasonal Crops:** "Which crops should I plant this season?"
+2️⃣ **Crop Details:** "Wheat complete guide"
+3️⃣ **Pest Control:** "How to control pests naturally?"
+4️⃣ **Fertilizers:** "NPK ratio for Tomato"
+5️⃣ **General Tips:** "Give me pro farming tips"
 
-Koi specific sawaal poochhein! 😊
-
-**Example questions:**
-• "Wheat ki kheti kab karein?"
-• "Keedon se kaise bachein?"
-• "Barish se pehle kya karein?"
-• "Konsi fasal zyada faida deti hai?"
+Just type your question! 🌾
 """
 
 # --- GET AI RESPONSE ---
 def get_ai_response(messages):
-    """Get response from AI using Groq API"""
     try:
         from groq import Groq
         
-        # API key read karne ka safe tareeqa
+        formatted_prompt = get_system_prompt()
+        
         try:
             api_key = os.getenv("GROQ_API_KEY")
             if api_key is None:
@@ -369,28 +578,21 @@ def get_ai_response(messages):
         
         client = Groq(api_key=api_key)
         
-        # Convert messages to Groq format
-        groq_messages = []
+        groq_messages = [{"role": "system", "content": formatted_prompt}]
         for msg in messages:
             if msg["role"] == "system":
-                groq_messages.append({"role": "system", "content": msg["content"]})
-            elif msg["role"] == "user":
-                groq_messages.append({"role": "user", "content": msg["content"]})
-            elif msg["role"] == "assistant":
-                groq_messages.append({"role": "assistant", "content": msg["content"]})
+                continue
+            groq_messages.append({"role": msg["role"], "content": msg["content"]})
         
-        # Get response from Groq
         completion = client.chat.completions.create(
             model="mixtral-8x7b-32768",
             messages=groq_messages,
             temperature=0.7,
-            max_tokens=600
+            max_tokens=800
         )
         
         response = completion.choices[0].message.content
-        
-        # Agar response empty hai toh fallback
-        if not response or len(response.strip()) < 5:
+        if not response or len(response.strip()) < 10:
             user_message = messages[-1]["content"] if messages else ""
             return fallback_response(user_message)
         
@@ -400,7 +602,54 @@ def get_ai_response(messages):
         user_message = messages[-1]["content"] if messages else ""
         return fallback_response(user_message)
 
-# --- DISPLAY CHAT HISTORY ---
+# --- SESSION STATE ---
+if "messages" not in st.session_state:
+    current_season, season_month, emoji = get_current_season()
+    st.session_state.messages = [
+        {"role": "system", "content": get_system_prompt()}
+    ]
+    
+    welcome = f"""
+🌾 **Welcome to KisaanMitra Pro!** 🌾
+
+🤖 I'm your professional agricultural consultant with 20+ years of expertise!
+
+🎯 **Current Season:** {current_season} {emoji} ({season_month})
+
+🌱 **I can help you with:**
+• 🌾 **Seasonal Crops** - "Which crops to plant now?"
+• 📋 **Crop Guides** - "Wheat complete guide"
+• 🐛 **Pest Control** - "How to control pests naturally?"
+• 🧪 **Fertilizers** - "Best fertilizer for Tomato"
+• 💧 **Irrigation** - "How much water needed?"
+
+Feel free to ask anything about farming! 😊🌾
+"""
+    st.session_state.messages.append({"role": "assistant", "content": welcome})
+
+if "quick_question" not in st.session_state:
+    st.session_state.quick_question = None
+
+# --- QUICK QUESTION HANDLING ---
+if st.session_state.quick_question:
+    question = st.session_state.quick_question
+    st.session_state.quick_question = None
+    
+    st.session_state.messages.append({"role": "user", "content": question})
+    
+    with st.chat_message("assistant"):
+        with st.spinner("🌾 KisaanMitra Pro is thinking..."):
+            response = get_ai_response(st.session_state.messages)
+            st.markdown(f"""
+            <div class="chat-message assistant-message">
+                🌾 {response}
+            </div>
+            """, unsafe_allow_html=True)
+            st.session_state.messages.append({"role": "assistant", "content": response})
+    
+    st.rerun()
+
+# --- DISPLAY CHAT ---
 for msg in st.session_state.messages:
     if msg["role"] == "system":
         continue
@@ -420,31 +669,12 @@ for msg in st.session_state.messages:
             </div>
             """, unsafe_allow_html=True)
 
-# --- QUICK QUESTION HANDLING ---
-if st.session_state.quick_question:
-    question = st.session_state.quick_question
-    st.session_state.quick_question = None
-    
-    st.session_state.messages.append({"role": "user", "content": question})
-    
-    with st.chat_message("assistant"):
-        with st.spinner("🌾 KisaanMitra soch raha hai..."):
-            response = get_ai_response(st.session_state.messages)
-            st.markdown(f"""
-            <div class="chat-message assistant-message">
-                🌾 {response}
-            </div>
-            """, unsafe_allow_html=True)
-            st.session_state.messages.append({"role": "assistant", "content": response})
-    
-    st.rerun()
-
 # --- USER INPUT ---
-user_input = st.chat_input("💬 Apna sawaal likhein...")
+user_input = st.chat_input("💬 Type your question here...")
 
 if user_input:
     if user_input.strip() == "":
-        st.warning("🙏 Kuch sawaal likhein!")
+        st.warning("🙏 Please type a question!")
     else:
         st.session_state.messages.append({"role": "user", "content": user_input})
         
@@ -456,7 +686,7 @@ if user_input:
             """, unsafe_allow_html=True)
         
         with st.chat_message("assistant"):
-            with st.spinner("🌾 KisaanMitra soch raha hai..."):
+            with st.spinner("🌾 KisaanMitra Pro is thinking..."):
                 response = get_ai_response(st.session_state.messages)
                 st.markdown(f"""
                 <div class="chat-message assistant-message">
@@ -468,6 +698,6 @@ if user_input:
 # --- FOOTER ---
 st.markdown("""
 <div class="footer">
-    🌾 KisaanMitra v1.0 • Made with ❤️ for Farmers • Always here to help!
+    🌾 KisaanMitra Pro • 30+ Crops • All Seasons • English
 </div>
 """, unsafe_allow_html=True)
