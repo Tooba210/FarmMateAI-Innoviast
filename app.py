@@ -155,29 +155,33 @@ for msg in st.session_state.messages:
             """, unsafe_allow_html=True)
 
 # --- USER INPUT ---
-def get_ai_response(messages):
-    """Get response from AI using Groq API"""
-    try:
-        from groq import Groq
+        # ---------- API KEY SAFE TAREEQE SE READ KAREIN ----------
+        try:
+            # Pehle .env file mein dekhein (local)
+            api_key = os.getenv("GROQ_API_KEY")
+            
+            # Agar .env mein nahi hai toh Streamlit Secrets mein dekhein (cloud)
+            if api_key is None:
+                api_key = st.secrets["GROQ_API_KEY"]
+        except:
+            # Agar error aaye toh direct secrets se lein
+            api_key = st.secrets["GROQ_API_KEY"]
+        # ---------- CHANGE KHATAM ----------
         
-        # Groq client initialize
-        api_key = os.getenv("GROQ_API_KEY")
-        
+        # Agar key nahi mili toh error message
         if not api_key:
             return """
             ⚠️ API Key not found!
             
             Please:
             1. Get API key from Groq
-            2. Add it to .env file
-            3. Or use alternative API
+            2. Add it to .env file (local) 
+            3. Or add it to Streamlit Secrets (cloud)
             
             🌾 Main ready hun aapki madad karne ke liye!
             """
         
-        
-        groq_api_key = st.secrets["GROQ_API_KEY"]
-        
+        client = Groq(api_key=api_key)
         # Convert messages to Groq format
         groq_messages = []
         for msg in messages:
