@@ -175,7 +175,8 @@ def get_ai_response(messages):
             🌾 Main ready hun aapki madad karne ke liye!
             """
         
-        client = Groq(api_key=api_key)
+        
+        groq_api_key = st.secrets["GROQ_API_KEY"]
         
         # Convert messages to Groq format
         groq_messages = []
