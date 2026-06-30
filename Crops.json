@@ -1,0 +1,31 @@
+{
+  "crops": [
+    {
+      "name": "Wheat (Gandum)",
+      "season": "Winter (November - March)",
+      "soil": "Loamy soil, pH 6.0-7.5",
+      "temperature": "15-20°C",
+      "water": "Moderate irrigation",
+      "fertilizer": "NPK 120:60:40 kg/hectare",
+      "harvest_time": "120-150 days"
+    },
+    {
+      "name": "Rice (Chawal)",
+      "season": "Monsoon (June - October)",
+      "soil": "Clay soil, pH 5.5-6.5",
+      "temperature": "25-30°C",
+      "water": "High water requirement",
+      "fertilizer": "NPK 100:50:50 kg/hectare",
+      "harvest_time": "120-140 days"
+    },
+    {
+      "name": "Corn (Makka)",
+      "season": "Spring (March - July)",
+      "soil": "Well-drained loam, pH 6.0-7.0",
+      "temperature": "20-30°C",
+      "water": "Moderate irrigation",
+      "fertilizer": "NPK 120:60:40 kg/hectare",
+      "harvest_time": "90-120 days"
+    }
+  ]
+}
