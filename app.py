@@ -1,6 +1,6 @@
 """
 FarmMateAI - AI-Powered Agricultural Assistant
-Your intelligent farming companion for crop guidance, pest control, and seasonal advice
+Professional Agricultural Consultant for Farmers
 """
 
 import streamlit as st
@@ -37,7 +37,7 @@ current_season, season_month, season_emoji = get_current_season()
 # --- PROFESSIONAL CSS ---
 st.markdown("""
 <style>
-    /* ===== GLOBAL STYLES ===== */
+    /* ===== RESET & BASE ===== */
     * {
         margin: 0;
         padding: 0;
@@ -45,19 +45,19 @@ st.markdown("""
     }
     
     .stApp {
-        background: #f0f4f0;
+        background: #f5f8f5;
     }
     
     /* ===== MAIN HEADER ===== */
     .main-header {
-        background: linear-gradient(135deg, #0d2818 0%, #1a4d0e 40%, #2d7a1a 100%);
-        padding: 28px 35px;
-        border-radius: 16px;
+        background: linear-gradient(135deg, #0f2b1a 0%, #1a4d0e 50%, #2a7a1a 100%);
+        padding: 32px 40px;
+        border-radius: 18px;
         text-align: center;
         color: white;
         margin-bottom: 20px;
-        box-shadow: 0 6px 30px rgba(13, 40, 24, 0.35);
-        border: 1px solid rgba(255, 213, 79, 0.15);
+        box-shadow: 0 8px 40px rgba(15, 43, 26, 0.3);
+        border: 1px solid rgba(255, 213, 79, 0.1);
         position: relative;
         overflow: hidden;
     }
@@ -65,18 +65,18 @@ st.markdown("""
     .main-header::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(135deg, rgba(255,213,79,0.05) 0%, transparent 60%);
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 70% 30%, rgba(255,213,79,0.06) 0%, transparent 60%);
         pointer-events: none;
     }
     
     .main-header .logo {
-        font-size: 2.6rem;
+        font-size: 2.8rem;
         font-weight: 800;
-        font-family: 'Segoe UI', 'Arial', sans-serif;
+        font-family: 'Inter', 'Segoe UI', 'Arial', sans-serif;
         letter-spacing: -0.5px;
         position: relative;
         z-index: 1;
@@ -91,68 +91,53 @@ st.markdown("""
         font-weight: 300;
         opacity: 0.85;
         margin-top: 6px;
-        letter-spacing: 1.5px;
+        letter-spacing: 2px;
         position: relative;
         z-index: 1;
-        font-family: 'Segoe UI', sans-serif;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
     }
     
     .main-header .badge-container {
-        margin-top: 10px;
+        margin-top: 12px;
         display: flex;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
         flex-wrap: wrap;
         position: relative;
         z-index: 1;
     }
     
     .main-header .badge-container .badge {
-        background: rgba(255,255,255,0.12);
-        backdrop-filter: blur(4px);
-        padding: 4px 16px;
-        border-radius: 20px;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(8px);
+        padding: 5px 18px;
+        border-radius: 50px;
         font-size: 0.7rem;
         font-weight: 500;
         letter-spacing: 0.5px;
-        border: 1px solid rgba(255,255,255,0.08);
-        font-family: 'Segoe UI', sans-serif;
-    }
-    
-    /* ===== SUB HEADER ===== */
-    .sub-header {
-        text-align: center;
-        background: rgba(255,255,255,0.92);
-        backdrop-filter: blur(10px);
-        padding: 14px 20px;
-        border-radius: 12px;
-        margin-bottom: 18px;
-        font-size: 0.95rem;
-        color: #1a3a1a;
-        border: 1px solid rgba(45, 122, 26, 0.08);
-        box-shadow: 0 2px 12px rgba(0,0,0,0.03);
-        font-family: 'Segoe UI', sans-serif;
+        border: 1px solid rgba(255,255,255,0.06);
+        font-family: 'Inter', 'Segoe UI', sans-serif;
     }
     
     /* ===== SIDEBAR ===== */
     .sidebar-box {
-        background: linear-gradient(145deg, #0d2818 0%, #1a4d0e 100%);
-        padding: 20px 18px;
-        border-radius: 14px;
+        background: linear-gradient(145deg, #0f2b1a 0%, #1a4d0e 100%);
+        padding: 22px 20px;
+        border-radius: 16px;
         color: white;
         margin-bottom: 16px;
-        box-shadow: 0 6px 24px rgba(13, 40, 24, 0.3);
-        border: 1px solid rgba(255, 213, 79, 0.08);
+        box-shadow: 0 8px 32px rgba(15, 43, 26, 0.25);
+        border: 1px solid rgba(255, 213, 79, 0.06);
     }
     
     .sidebar-box h3 {
         color: #ffd54f;
         font-size: 1rem;
         font-weight: 700;
-        border-bottom: 2px solid rgba(255, 213, 79, 0.2);
+        border-bottom: 2px solid rgba(255, 213, 79, 0.15);
         padding-bottom: 12px;
-        margin-bottom: 12px;
-        font-family: 'Segoe UI', sans-serif;
+        margin-bottom: 14px;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
         letter-spacing: 0.3px;
     }
     
@@ -163,61 +148,131 @@ st.markdown("""
     }
     
     .sidebar-box li {
-        padding: 8px 12px;
+        padding: 10px 14px;
         margin: 6px 0;
-        background: rgba(255,255,255,0.06);
-        border-radius: 8px;
+        background: rgba(255,255,255,0.04);
+        border-radius: 10px;
         font-size: 0.85rem;
-        font-family: 'Segoe UI', sans-serif;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
         border-left: 3px solid transparent;
         transition: all 0.25s ease;
         color: rgba(255,255,255,0.85);
     }
     
     .sidebar-box li:hover {
-        background: rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.08);
         border-left-color: #ffd54f;
         transform: translateX(4px);
     }
     
     .sidebar-box .stats {
-        background: rgba(255,255,255,0.06);
-        padding: 10px 14px;
-        border-radius: 8px;
-        margin-top: 12px;
+        background: rgba(255,255,255,0.05);
+        padding: 12px 16px;
+        border-radius: 10px;
+        margin-top: 14px;
         text-align: center;
         font-size: 0.75rem;
-        font-family: 'Segoe UI', sans-serif;
-        border: 1px dashed rgba(255,213,79,0.15);
-        color: rgba(255,255,255,0.7);
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        border: 1px dashed rgba(255,213,79,0.1);
+        color: rgba(255,255,255,0.6);
     }
     
     .sidebar-box .stats strong {
         color: #ffd54f;
     }
     
+    /* ===== SIDEBAR SECTION TITLE ===== */
+    .sidebar-section-title {
+        color: rgba(255,255,255,0.3);
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 2.5px;
+        margin: 18px 0 12px 0;
+        font-weight: 700;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+    
+    /* ===== BUTTONS ===== */
+    .stButton > button {
+        background: linear-gradient(135deg, #2a7a1a 0%, #1a4d0e 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 100%;
+        cursor: pointer;
+        letter-spacing: 0.3px;
+        box-shadow: 0 4px 16px rgba(26, 77, 14, 0.2);
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 32px rgba(26, 77, 14, 0.35);
+        background: linear-gradient(135deg, #3a9a27 0%, #1a4d0e 100%);
+    }
+    
+    .stButton > button:active {
+        transform: scale(0.97);
+    }
+    
+    /* Quick Question Buttons */
+    .quick-btn .stButton > button {
+        background: rgba(255,255,255,0.06);
+        color: #e8f0e8;
+        border: 1px solid rgba(255,255,255,0.06);
+        box-shadow: none;
+        padding: 8px 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .quick-btn .stButton > button:hover {
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,213,79,0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    
+    /* Reset Button */
+    .reset-btn .stButton > button {
+        background: rgba(255,255,255,0.04);
+        color: rgba(255,255,255,0.6);
+        border: 1px solid rgba(255,255,255,0.04);
+        box-shadow: none;
+    }
+    
+    .reset-btn .stButton > button:hover {
+        background: rgba(255,255,255,0.08);
+        color: white;
+        border-color: rgba(255,255,255,0.08);
+    }
+    
     /* ===== CHAT MESSAGES ===== */
     .chat-message {
         padding: 16px 20px;
-        border-radius: 12px;
+        border-radius: 14px;
         margin: 10px 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.03);
         animation: fadeIn 0.4s ease;
-        line-height: 1.6;
-        font-family: 'Segoe UI', sans-serif;
+        line-height: 1.7;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
         font-size: 0.95rem;
     }
     
     @keyframes fadeIn {
-        0% { opacity: 0; transform: translateY(8px); }
+        0% { opacity: 0; transform: translateY(10px); }
         100% { opacity: 1; transform: translateY(0); }
     }
     
     .user-message {
         background: #e8f0e8;
-        border-left: 4px solid #2d7a1a;
+        border-left: 4px solid #2a7a1a;
         margin-left: 20px;
-        border-radius: 12px 12px 4px 12px;
+        border-radius: 14px 14px 4px 14px;
         color: #1a3a1a;
     }
     
@@ -225,86 +280,29 @@ st.markdown("""
         background: #ffffff;
         border-left: 4px solid #1a4d0e;
         margin-right: 20px;
-        border-radius: 12px 12px 12px 4px;
+        border-radius: 14px 14px 14px 4px;
         border: 1px solid #e8ede8;
         color: #1a2a1a;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+        transition: all 0.3s ease;
     }
     
     .assistant-message:hover {
-        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    }
-    
-    /* ===== BUTTONS ===== */
-    .stButton > button {
-        background: linear-gradient(135deg, #2d7a1a 0%, #1a4d0e 100%);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 10px 18px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        font-family: 'Segoe UI', sans-serif;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        width: 100%;
-        cursor: pointer;
-        letter-spacing: 0.3px;
-        box-shadow: 0 2px 12px rgba(26, 77, 14, 0.2);
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 24px rgba(26, 77, 14, 0.35);
-        background: linear-gradient(135deg, #3a8a27 0%, #1a4d0e 100%);
-    }
-    
-    .stButton > button:active {
-        transform: scale(0.98);
-    }
-    
-    /* Quick Question Buttons - Secondary Style */
-    .quick-btn .stButton > button {
-        background: rgba(45, 122, 26, 0.08);
-        color: #1a4d0e;
-        border: 1px solid rgba(45, 122, 26, 0.15);
-        box-shadow: none;
-        padding: 8px 12px;
-        font-size: 0.8rem;
-        font-weight: 500;
-    }
-    
-    .quick-btn .stButton > button:hover {
-        background: rgba(45, 122, 26, 0.15);
-        border-color: #2d7a1a;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(45, 122, 26, 0.15);
-    }
-    
-    /* Reset Button */
-    .reset-btn .stButton > button {
-        background: rgba(255, 255, 255, 0.08);
-        color: #e8e8e8;
-        border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: none;
-    }
-    
-    .reset-btn .stButton > button:hover {
-        background: rgba(255, 255, 255, 0.15);
-        border-color: rgba(255,255,255,0.2);
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
     }
     
     /* ===== INPUT BOX ===== */
     .stChatInputContainer {
-        border-radius: 12px !important;
-        border: 2px solid #d0ddd0 !important;
+        border-radius: 14px !important;
+        border: 2px solid #d5e0d5 !important;
         background: white !important;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.03) !important;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.02) !important;
         transition: border-color 0.3s ease !important;
     }
     
     .stChatInputContainer:focus-within {
-        border-color: #2d7a1a !important;
-        box-shadow: 0 0 0 4px rgba(45, 122, 26, 0.08) !important;
+        border-color: #2a7a1a !important;
+        box-shadow: 0 0 0 4px rgba(42, 122, 26, 0.06) !important;
     }
     
     /* ===== FOOTER ===== */
@@ -314,20 +312,20 @@ st.markdown("""
         left: 0;
         right: 0;
         text-align: center;
-        padding: 12px 20px;
-        background: linear-gradient(135deg, #0d2818 0%, #1a4d0e 100%);
-        color: rgba(255, 213, 79, 0.6);
-        border-top: 1px solid rgba(255, 213, 79, 0.06);
+        padding: 14px 20px;
+        background: linear-gradient(135deg, #0f2b1a 0%, #1a4d0e 100%);
+        color: rgba(255, 213, 79, 0.4);
+        border-top: 1px solid rgba(255, 213, 79, 0.04);
         font-size: 0.7rem;
-        font-family: 'Segoe UI', sans-serif;
-        letter-spacing: 1px;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        letter-spacing: 1.5px;
         z-index: 1000;
         backdrop-filter: blur(10px);
     }
     
     .footer span {
         color: #ffd54f;
-        opacity: 0.8;
+        opacity: 0.5;
     }
     
     /* ===== SCROLLBAR ===== */
@@ -342,7 +340,7 @@ st.markdown("""
     }
     
     ::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #2d7a1a, #1a4d0e);
+        background: linear-gradient(135deg, #2a7a1a, #1a4d0e);
         border-radius: 10px;
     }
     
@@ -375,25 +373,14 @@ st.markdown("""
         
         .sidebar-box li {
             font-size: 0.8rem;
-            padding: 6px 10px;
+            padding: 8px 12px;
         }
     }
     
-    /* ===== UTILITY CLASSES ===== */
+    /* ===== UTILITY ===== */
     .text-center { text-align: center; }
     .mt-1 { margin-top: 10px; }
     .mb-1 { margin-bottom: 10px; }
-    
-    /* ===== SIDEBAR SECTION TITLE ===== */
-    .sidebar-section-title {
-        color: rgba(255,255,255,0.4);
-        font-size: 0.65rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin: 16px 0 10px 0;
-        font-weight: 600;
-        font-family: 'Segoe UI', sans-serif;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -510,13 +497,12 @@ IMPORTANT:
 - ALWAYS give COMPLETE information
 - Use simple, friendly language
 - Be professional and helpful
+- If user asks anything non-farming, politely say: "I'm only an agricultural consultant. Please ask me about crops, pests, seasons, fertilizers, and farming."
 
 CURRENT SEASON: {current_season} ({season_month}) {emoji}
-
-For non-farming questions: "I'm only an agricultural consultant. Please ask me about crops, pests, seasons, fertilizers, and farming."
 """
 
-# --- CROP DATABASE (30+ Crops) ---
+# --- CROP DATABASE ---
 CROP_DATABASE = {
     "wheat": {
         "name": "Wheat (Gandum)",
@@ -804,22 +790,22 @@ Need specific pest advice? Tell me your crop! 🌾
 Just ask in English! 🌾
 """
     
-    # Default
-    current_season, season_month, emoji = get_current_season()
-    return f"""
-🌾 **FarmMateAI - Here to Help!**
+    # Default - Short & Professional
+    return """
+🌾 **FarmMateAI - Agricultural Assistant**
 
-🎯 **Current Season:** {current_season} {emoji}
+✅ **I can help with:**
+• Crop recommendations
+• Complete crop guides (soil, water, fertilizer)
+• Pest control solutions
+• Seasonal farming tips
 
-📌 **What would you like to know?**
+❌ **I don't know about:**
+• Non-farming topics
+• Weather forecasts
+• Personal advice
 
-1️⃣ **Seasonal Crops:** "Which crops should I plant this season?"
-2️⃣ **Crop Details:** "Wheat complete guide"
-3️⃣ **Pest Control:** "How to control pests naturally?"
-4️⃣ **Fertilizers:** "NPK ratio for Tomato"
-5️⃣ **General Tips:** "Give me pro farming tips"
-
-Just type your question! 🌾
+📌 **Just ask me about farming!** 🌾
 """
 
 # --- GET AI RESPONSE ---
@@ -904,11 +890,7 @@ if st.session_state.quick_question:
     with st.chat_message("assistant"):
         with st.spinner("🌾 FarmMateAI is thinking..."):
             response = get_ai_response(st.session_state.messages)
-            st.markdown(f"""
-            <div class="chat-message assistant-message">
-                🌾 {response}
-            </div>
-            """, unsafe_allow_html=True)
+            st.write(response)
             st.session_state.messages.append({"role": "assistant", "content": response})
     
     st.rerun()
@@ -920,18 +902,10 @@ for msg in st.session_state.messages:
     
     if msg["role"] == "user":
         with st.chat_message("user"):
-            st.markdown(f"""
-            <div class="chat-message user-message">
-                🧑‍🌾 {msg["content"]}
-            </div>
-            """, unsafe_allow_html=True)
+            st.write(msg["content"])
     else:
         with st.chat_message("assistant"):
-            st.markdown(f"""
-            <div class="chat-message assistant-message">
-                🌾 {msg["content"]}
-            </div>
-            """, unsafe_allow_html=True)
+            st.write(msg["content"])
 
 # --- USER INPUT ---
 user_input = st.chat_input("💬 Type your farming question here...")
@@ -940,23 +914,18 @@ if user_input:
     if user_input.strip() == "":
         st.warning("🙏 Please type a question!")
     else:
+        # ✅ ADD USER MESSAGE
         st.session_state.messages.append({"role": "user", "content": user_input})
         
+        # ✅ DISPLAY USER MESSAGE
         with st.chat_message("user"):
-            st.markdown(f"""
-            <div class="chat-message user-message">
-                🧑‍🌾 {user_input}
-            </div>
-            """, unsafe_allow_html=True)
+            st.write(user_input)
         
+        # ✅ GET AND DISPLAY BOT RESPONSE
         with st.chat_message("assistant"):
             with st.spinner("🌾 FarmMateAI is thinking..."):
                 response = get_ai_response(st.session_state.messages)
-                st.markdown(f"""
-                <div class="chat-message assistant-message">
-                    🌾 {response}
-                </div>
-                """, unsafe_allow_html=True)
+                st.write(response)
                 st.session_state.messages.append({"role": "assistant", "content": response})
 
 # --- FOOTER ---
