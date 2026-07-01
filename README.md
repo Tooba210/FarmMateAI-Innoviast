@@ -57,7 +57,7 @@ FarmMateAI/
 ## 🚀 Live Demo
 
 **Deployed on Streamlit Cloud:**  
-👉 [FarmMateAI Live App](https://farmmateai.streamlit.app)
+👉 (https://farmmateai-innoviast-3zqmh2ecc5qjjyejrdyzbt.streamlit.app/)
 
 ---
 
@@ -134,25 +134,9 @@ Port                  already in use Kill existing streamlit process or use diff
 Deploy               on Streamlit Cloud (FREE)
 Push                  your code to GitHub
 
-Go to share.streamlit.io
 
-Sign in with GitHub
 
-Select repository: Tooba210/FarmMateAI
 
-Branch: main
-
-Main file: app.py
-
-Click "Deploy"
-
-Add Secrets on Streamlit Cloud
-Go to your app's Settings → Secrets
-
-Add:
-
-toml
-GROQ_API_KEY = "your_groq_api_key_here"
 🤝 Contributing
 This project is part of my internship at Innoviast. Suggestions and feedback are welcome!
 
@@ -186,12 +170,5 @@ Built with ❤️ for farmers and agriculture enthusiasts.
 
 FarmMateAI — Your AI-Powered Farming Companion 🌾
 
-
- Push to GitHub**
-
-```bash
-git add README.md
-git commit -m "Updated README.md with complete project details"
-git push
 
 
