@@ -1,7 +1,7 @@
-# 🌾 KisaanMitraBot-Innoviast
+# 🌾 FarmMateAI-Innoviast
 
 ## Overview
-KisaanMitra is a chatbot that helps farmers with crop recommendations, pest control advice, and weather-related farming tips.
+FarmMateAI is a chatbot that helps farmers with crop recommendations, pest control advice, and weather-related farming tips.
 
 ## Features
 - 🌱 Crop recommendations

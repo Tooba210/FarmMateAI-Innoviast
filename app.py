@@ -1,6 +1,6 @@
 """
-KisaanMitra Pro - Agricultural Assistant Bot
-Pure English Version - Simple & Clean
+FarmMateAI - AI-Powered Agricultural Assistant
+Your intelligent farming companion for crop guidance, pest control, and seasonal advice
 """
 
 import streamlit as st
@@ -14,9 +14,10 @@ load_dotenv()
 
 # --- PAGE CONFIG ---
 st.set_page_config(
-    page_title="KisaanMitra Pro 🌾",
+    page_title="FarmMateAI 🌾",
     page_icon="🌾",
-    layout="centered"
+    layout="centered",
+    initial_sidebar_state="expanded"
 )
 
 # --- SEASON DETECTION ---
@@ -33,115 +34,365 @@ def get_current_season():
 
 current_season, season_month, season_emoji = get_current_season()
 
-# --- CUSTOM CSS ---
+# --- PROFESSIONAL CSS ---
 st.markdown("""
 <style>
+    /* ===== GLOBAL STYLES ===== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
     .stApp {
-        background: linear-gradient(135deg, #f5f9f0 0%, #e8f5e9 50%, #c8e6c9 100%);
+        background: #f0f4f0;
     }
+    
+    /* ===== MAIN HEADER ===== */
     .main-header {
-        background: linear-gradient(135deg, #1b4d0e 0%, #2d7a1a 40%, #43a047 100%);
-        padding: 30px;
-        border-radius: 20px;
+        background: linear-gradient(135deg, #0d2818 0%, #1a4d0e 40%, #2d7a1a 100%);
+        padding: 28px 35px;
+        border-radius: 16px;
         text-align: center;
         color: white;
-        font-size: 2.8rem;
-        margin-bottom: 15px;
-        box-shadow: 0 8px 32px rgba(27, 77, 14, 0.35);
-        font-family: 'Arial Black', sans-serif;
-    }
-    .sub-header {
-        text-align: center;
-        background: rgba(255,255,255,0.85);
-        padding: 15px;
-        border-radius: 15px;
         margin-bottom: 20px;
-        font-size: 1.1rem;
-        color: #1a4d0e;
-        border: 1px solid rgba(76, 175, 80, 0.2);
+        box-shadow: 0 6px 30px rgba(13, 40, 24, 0.35);
+        border: 1px solid rgba(255, 213, 79, 0.15);
+        position: relative;
+        overflow: hidden;
     }
-    .badge {
-        display: inline-block;
-        background: #43a047;
-        color: white;
+    
+    .main-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255,213,79,0.05) 0%, transparent 60%);
+        pointer-events: none;
+    }
+    
+    .main-header .logo {
+        font-size: 2.6rem;
+        font-weight: 800;
+        font-family: 'Segoe UI', 'Arial', sans-serif;
+        letter-spacing: -0.5px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .main-header .logo span {
+        color: #ffd54f;
+    }
+    
+    .main-header .sub-title {
+        font-size: 0.9rem;
+        font-weight: 300;
+        opacity: 0.85;
+        margin-top: 6px;
+        letter-spacing: 1.5px;
+        position: relative;
+        z-index: 1;
+        font-family: 'Segoe UI', sans-serif;
+    }
+    
+    .main-header .badge-container {
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .main-header .badge-container .badge {
+        background: rgba(255,255,255,0.12);
+        backdrop-filter: blur(4px);
         padding: 4px 16px;
         border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        margin: 0 4px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        border: 1px solid rgba(255,255,255,0.08);
+        font-family: 'Segoe UI', sans-serif;
     }
-    .chat-message {
-        padding: 18px 22px;
-        border-radius: 16px;
-        margin: 12px 0;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-        animation: fadeIn 0.5s ease;
-        line-height: 1.7;
+    
+    /* ===== SUB HEADER ===== */
+    .sub-header {
+        text-align: center;
+        background: rgba(255,255,255,0.92);
+        backdrop-filter: blur(10px);
+        padding: 14px 20px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        font-size: 0.95rem;
+        color: #1a3a1a;
+        border: 1px solid rgba(45, 122, 26, 0.08);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+        font-family: 'Segoe UI', sans-serif;
     }
-    @keyframes fadeIn {
-        0% { opacity: 0; transform: translateY(10px); }
-        100% { opacity: 1; transform: translateY(0); }
-    }
-    .user-message {
-        background: #e8f5e9;
-        border-left: 6px solid #2e7d32;
-        margin-left: 30px;
-        border-radius: 16px 16px 4px 16px;
-    }
-    .assistant-message {
-        background: white;
-        border-left: 6px solid #558b2f;
-        margin-right: 30px;
-        border-radius: 16px 16px 16px 4px;
-        border: 1px solid #e0e0e0;
-    }
+    
+    /* ===== SIDEBAR ===== */
     .sidebar-box {
-        background: linear-gradient(145deg, #1a4d0e 0%, #2d7a1a 100%);
-        padding: 20px;
-        border-radius: 16px;
+        background: linear-gradient(145deg, #0d2818 0%, #1a4d0e 100%);
+        padding: 20px 18px;
+        border-radius: 14px;
         color: white;
         margin-bottom: 16px;
-        box-shadow: 0 8px 24px rgba(26, 77, 14, 0.3);
+        box-shadow: 0 6px 24px rgba(13, 40, 24, 0.3);
+        border: 1px solid rgba(255, 213, 79, 0.08);
     }
+    
     .sidebar-box h3 {
         color: #ffd54f;
-        border-bottom: 2px solid #ffd54f;
+        font-size: 1rem;
+        font-weight: 700;
+        border-bottom: 2px solid rgba(255, 213, 79, 0.2);
         padding-bottom: 12px;
+        margin-bottom: 12px;
+        font-family: 'Segoe UI', sans-serif;
+        letter-spacing: 0.3px;
     }
-    .sidebar-box li {
-        margin: 10px 0;
-        padding: 6px 12px;
-        background: rgba(255,255,255,0.08);
-        border-radius: 8px;
+    
+    .sidebar-box ul {
+        padding-left: 0;
         list-style: none;
+        margin: 0;
     }
+    
+    .sidebar-box li {
+        padding: 8px 12px;
+        margin: 6px 0;
+        background: rgba(255,255,255,0.06);
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-family: 'Segoe UI', sans-serif;
+        border-left: 3px solid transparent;
+        transition: all 0.25s ease;
+        color: rgba(255,255,255,0.85);
+    }
+    
+    .sidebar-box li:hover {
+        background: rgba(255,255,255,0.12);
+        border-left-color: #ffd54f;
+        transform: translateX(4px);
+    }
+    
+    .sidebar-box .stats {
+        background: rgba(255,255,255,0.06);
+        padding: 10px 14px;
+        border-radius: 8px;
+        margin-top: 12px;
+        text-align: center;
+        font-size: 0.75rem;
+        font-family: 'Segoe UI', sans-serif;
+        border: 1px dashed rgba(255,213,79,0.15);
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .sidebar-box .stats strong {
+        color: #ffd54f;
+    }
+    
+    /* ===== CHAT MESSAGES ===== */
+    .chat-message {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin: 10px 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        animation: fadeIn 0.4s ease;
+        line-height: 1.6;
+        font-family: 'Segoe UI', sans-serif;
+        font-size: 0.95rem;
+    }
+    
+    @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(8px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    
+    .user-message {
+        background: #e8f0e8;
+        border-left: 4px solid #2d7a1a;
+        margin-left: 20px;
+        border-radius: 12px 12px 4px 12px;
+        color: #1a3a1a;
+    }
+    
+    .assistant-message {
+        background: #ffffff;
+        border-left: 4px solid #1a4d0e;
+        margin-right: 20px;
+        border-radius: 12px 12px 12px 4px;
+        border: 1px solid #e8ede8;
+        color: #1a2a1a;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    
+    .assistant-message:hover {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    
+    /* ===== BUTTONS ===== */
     .stButton > button {
-        background: linear-gradient(135deg, #43a047 0%, #2d7a1a 100%);
+        background: linear-gradient(135deg, #2d7a1a 0%, #1a4d0e 100%);
         color: white;
         border: none;
-        border-radius: 12px;
-        padding: 12px 20px;
+        border-radius: 10px;
+        padding: 10px 18px;
         font-weight: 600;
-        transition: all 0.3s ease;
+        font-size: 0.85rem;
+        font-family: 'Segoe UI', sans-serif;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         width: 100%;
         cursor: pointer;
+        letter-spacing: 0.3px;
+        box-shadow: 0 2px 12px rgba(26, 77, 14, 0.2);
     }
+    
     .stButton > button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 28px rgba(45, 122, 26, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(26, 77, 14, 0.35);
+        background: linear-gradient(135deg, #3a8a27 0%, #1a4d0e 100%);
     }
+    
+    .stButton > button:active {
+        transform: scale(0.98);
+    }
+    
+    /* Quick Question Buttons - Secondary Style */
+    .quick-btn .stButton > button {
+        background: rgba(45, 122, 26, 0.08);
+        color: #1a4d0e;
+        border: 1px solid rgba(45, 122, 26, 0.15);
+        box-shadow: none;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .quick-btn .stButton > button:hover {
+        background: rgba(45, 122, 26, 0.15);
+        border-color: #2d7a1a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(45, 122, 26, 0.15);
+    }
+    
+    /* Reset Button */
+    .reset-btn .stButton > button {
+        background: rgba(255, 255, 255, 0.08);
+        color: #e8e8e8;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: none;
+    }
+    
+    .reset-btn .stButton > button:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255,255,255,0.2);
+    }
+    
+    /* ===== INPUT BOX ===== */
+    .stChatInputContainer {
+        border-radius: 12px !important;
+        border: 2px solid #d0ddd0 !important;
+        background: white !important;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.03) !important;
+        transition: border-color 0.3s ease !important;
+    }
+    
+    .stChatInputContainer:focus-within {
+        border-color: #2d7a1a !important;
+        box-shadow: 0 0 0 4px rgba(45, 122, 26, 0.08) !important;
+    }
+    
+    /* ===== FOOTER ===== */
     .footer {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
         text-align: center;
-        padding: 12px;
-        background: linear-gradient(135deg, #1a4d0e 0%, #2d7a1a 100%);
-        color: #ffd54f;
-        border-top: 3px solid #ffd54f;
-        font-size: 0.8rem;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #0d2818 0%, #1a4d0e 100%);
+        color: rgba(255, 213, 79, 0.6);
+        border-top: 1px solid rgba(255, 213, 79, 0.06);
+        font-size: 0.7rem;
+        font-family: 'Segoe UI', sans-serif;
+        letter-spacing: 1px;
         z-index: 1000;
+        backdrop-filter: blur(10px);
+    }
+    
+    .footer span {
+        color: #ffd54f;
+        opacity: 0.8;
+    }
+    
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #e8efe8;
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #2d7a1a, #1a4d0e);
+        border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #1a4d0e;
+    }
+    
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .main-header .logo {
+            font-size: 1.8rem;
+        }
+        
+        .main-header {
+            padding: 20px;
+        }
+        
+        .chat-message {
+            padding: 12px 16px;
+            margin: 8px 0;
+        }
+        
+        .user-message {
+            margin-left: 8px;
+        }
+        
+        .assistant-message {
+            margin-right: 8px;
+        }
+        
+        .sidebar-box li {
+            font-size: 0.8rem;
+            padding: 6px 10px;
+        }
+    }
+    
+    /* ===== UTILITY CLASSES ===== */
+    .text-center { text-align: center; }
+    .mt-1 { margin-top: 10px; }
+    .mb-1 { margin-bottom: 10px; }
+    
+    /* ===== SIDEBAR SECTION TITLE ===== */
+    .sidebar-section-title {
+        color: rgba(255,255,255,0.4);
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 16px 0 10px 0;
+        font-weight: 600;
+        font-family: 'Segoe UI', sans-serif;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -149,14 +400,14 @@ st.markdown("""
 # --- HEADER ---
 st.markdown(f"""
 <div class="main-header">
-    🌾 KisaanMitra Pro
-</div>
-<div class="sub-header">
-    🤖 Professional Agricultural Consultant • 30+ Crops • All Seasons
-    <br>
-    <span class="badge">{season_emoji} {current_season}</span>
-    <span class="badge">🌱 30+ Crops</span>
-    <span class="badge">💬 English</span>
+    <div class="logo">🌾 Farm<span>Mate</span>AI</div>
+    <div class="sub-title">Professional Agricultural Consultant • AI-Powered Guidance</div>
+    <div class="badge-container">
+        <span class="badge">{season_emoji} {current_season}</span>
+        <span class="badge">🌱 30+ Crops</span>
+        <span class="badge">📋 Expert Advice</span>
+        <span class="badge">🤖 AI Assistant</span>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -164,7 +415,7 @@ st.markdown(f"""
 with st.sidebar:
     st.markdown(f"""
     <div class="sidebar-box">
-        <h3>🌱 About KisaanMitra</h3>
+        <h3>🌱 About FarmMateAI</h3>
         <ul>
             <li>🌾 <b>Seasonal Crops</b> — What to plant now</li>
             <li>📋 <b>Crop Guides</b> — Soil, water, fertilizer</li>
@@ -172,44 +423,57 @@ with st.sidebar:
             <li>🌧️ <b>Weather Tips</b> — Season-wise advice</li>
             <li>🧑‍🌾 <b>Pro Tips</b> — For maximum yield</li>
         </ul>
-        <hr>
-        <p style="font-size:0.8rem;">🌟 {season_emoji} Current: <b>{current_season}</b></p>
+        <div class="stats">
+            {season_emoji} <strong>Current Season:</strong> {current_season} • {season_month}
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
+    # Reset Button
+    st.markdown('<div class="reset-btn">', unsafe_allow_html=True)
     if st.button("🔄 Reset Conversation", use_container_width=True):
         st.session_state.messages = []
         st.session_state.quick_question = None
         st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
     
-    st.markdown("---")
-    st.markdown("### ⚡ Quick Questions")
+    st.markdown('<div class="sidebar-section-title">⚡ Quick Actions</div>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("🌾 Seasonal Crops", use_container_width=True):
+        st.markdown('<div class="quick-btn">', unsafe_allow_html=True)
+        if st.button("🌾 Seasonal", use_container_width=True):
             st.session_state.quick_question = "Which crops should I plant this season?"
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    
     with col2:
+        st.markdown('<div class="quick-btn">', unsafe_allow_html=True)
         if st.button("📋 Crop Guide", use_container_width=True):
             st.session_state.quick_question = "Give me complete guide for Wheat"
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
     
     col3, col4 = st.columns(2)
     with col3:
+        st.markdown('<div class="quick-btn">', unsafe_allow_html=True)
         if st.button("🐛 Pest Control", use_container_width=True):
             st.session_state.quick_question = "How to control pests naturally?"
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+    
     with col4:
+        st.markdown('<div class="quick-btn">', unsafe_allow_html=True)
         if st.button("🧑‍🌾 Pro Tips", use_container_width=True):
             st.session_state.quick_question = "Give me pro farming tips"
             st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # --- SYSTEM PROMPT ---
 def get_system_prompt():
     current_season, season_month, emoji = get_current_season()
     return f"""
-You are KisaanMitra Pro, a professional agricultural consultant with 20+ years of farming expertise.
+You are FarmMateAI, a professional agricultural consultant with 20+ years of farming expertise.
 
 YOUR EXPERTISE:
 - Deep knowledge of ALL seasonal crops (30+ crops database)
@@ -521,7 +785,7 @@ Need specific pest advice? Tell me your crop! 🌾
     guide_keywords = ['help', 'guide', 'tips', 'advice', 'suggest']
     if any(word in user_message for word in guide_keywords):
         return """
-🌾 **KisaanMitra Pro - Complete Farming Guide**
+🌾 **FarmMateAI - Complete Farming Guide**
 
 🎯 **What I can help you with:**
 
@@ -543,7 +807,7 @@ Just ask in English! 🌾
     # Default
     current_season, season_month, emoji = get_current_season()
     return f"""
-🌾 **KisaanMitra Pro - Here to Help!**
+🌾 **FarmMateAI - Here to Help!**
 
 🎯 **Current Season:** {current_season} {emoji}
 
@@ -610,7 +874,7 @@ if "messages" not in st.session_state:
     ]
     
     welcome = f"""
-🌾 **Welcome to KisaanMitra Pro!** 🌾
+🌾 **Welcome to FarmMateAI!** 🌾
 
 🤖 I'm your professional agricultural consultant with 20+ years of expertise!
 
@@ -638,7 +902,7 @@ if st.session_state.quick_question:
     st.session_state.messages.append({"role": "user", "content": question})
     
     with st.chat_message("assistant"):
-        with st.spinner("🌾 KisaanMitra Pro is thinking..."):
+        with st.spinner("🌾 FarmMateAI is thinking..."):
             response = get_ai_response(st.session_state.messages)
             st.markdown(f"""
             <div class="chat-message assistant-message">
@@ -670,7 +934,7 @@ for msg in st.session_state.messages:
             """, unsafe_allow_html=True)
 
 # --- USER INPUT ---
-user_input = st.chat_input("💬 Type your question here...")
+user_input = st.chat_input("💬 Type your farming question here...")
 
 if user_input:
     if user_input.strip() == "":
@@ -686,7 +950,7 @@ if user_input:
             """, unsafe_allow_html=True)
         
         with st.chat_message("assistant"):
-            with st.spinner("🌾 KisaanMitra Pro is thinking..."):
+            with st.spinner("🌾 FarmMateAI is thinking..."):
                 response = get_ai_response(st.session_state.messages)
                 st.markdown(f"""
                 <div class="chat-message assistant-message">
@@ -698,6 +962,6 @@ if user_input:
 # --- FOOTER ---
 st.markdown("""
 <div class="footer">
-    🌾 KisaanMitra Pro • 30+ Crops • All Seasons • English
+    🌾 FarmMateAI • <span>Professional Agricultural AI</span> • 30+ Crops • All Seasons
 </div>
 """, unsafe_allow_html=True)
