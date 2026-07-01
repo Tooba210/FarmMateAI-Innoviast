@@ -6,14 +6,9 @@ FarmMateAI is an intelligent chatbot that helps farmers with **crop recommendati
 
 ---
 
-## 📸 Screenshots
-
-*Add your screenshots here after deploying the app*
-
 | Homepage | Crop Guide | Pest Control |
 |----------|------------|--------------|
-| ![Homepage](screenshots/homepage.png) | ![Crop Guide](screenshots/crop-guide.png) | ![Pest Control](screenshots/pest-control.png) |
-
+| ![Homepage](Screenshots/homepage.png) | ![Crop Guide](Screenshots/crop-guide.png) | ![Pest Control](Screenshots/pest-control.png) |
 ---
 
 ## 🎯 Features
